@@ -1,17 +1,3 @@
-"""
-VietEngine — Zero-shot Vietnamese TTS
-Trực tiếp dùng model weights từ pnnbao-ump/VieNeu-TTS (PyTorch).
-Không phụ thuộc vào thư viện vieneu.
-
-Flow:
-  ref_audio → NeuCodec.encode_code() → ref_codes
-  ref_text  → sea-g2p → ref_phonemes
-  target    → sea-g2p → tgt_phonemes
-  build_prompt(ref_phonemes + tgt_phonemes, ref_codes)
-  → CausalLM.generate()
-  → NeuCodec.decode_code() → wav float32 24kHz
-"""
-
 import logging
 import re
 from pathlib import Path
@@ -36,9 +22,10 @@ class VietEngine:
     def __init__(
         self,
         backbone_repo: str = BACKBONE_REPO,
-        codec_repo:    str = CODEC_REPO,
-        device:        str = "cpu",
+        codec_repo: str = CODEC_REPO,
+        device: str = "cpu",
         mode: str = "standard",
+        hf_token: str = None,
     ):
         if mode not in ("standard", "fast"):
             raise ValueError(f"mode must be 'standard' or 'fast', got {mode!r}")
@@ -160,11 +147,11 @@ class VietEngine:
         """
         tok = self.tokenizer
 
-        SPEECH_REPLACE    = tok.convert_tokens_to_ids("<|SPEECH_REPLACE|>")
-        SPEECH_GEN_START  = tok.convert_tokens_to_ids("<|SPEECH_GENERATION_START|>")
-        TEXT_REPLACE      = tok.convert_tokens_to_ids("<|TEXT_REPLACE|>")
+        SPEECH_REPLACE = tok.convert_tokens_to_ids("<|SPEECH_REPLACE|>")
+        SPEECH_GEN_START = tok.convert_tokens_to_ids("<|SPEECH_GENERATION_START|>")
+        TEXT_REPLACE = tok.convert_tokens_to_ids("<|TEXT_REPLACE|>")
         TEXT_PROMPT_START = tok.convert_tokens_to_ids("<|TEXT_PROMPT_START|>")
-        TEXT_PROMPT_END   = tok.convert_tokens_to_ids("<|TEXT_PROMPT_END|>")
+        TEXT_PROMPT_END = tok.convert_tokens_to_ids("<|TEXT_PROMPT_END|>")
 
         phoneme_ids = tok.encode(
             f"{ref_phonemes} {tgt_phonemes}",
@@ -190,6 +177,8 @@ class VietEngine:
             add_special_tokens=False,
         )
         ids = ids[:sr_idx] + [SPEECH_GEN_START] + codes_tokens
+        logger.info("Build prompt: ", ids)
+
         return ids
 
     def _build_prompt_text(

@@ -1,30 +1,3 @@
-"""
-run.py — Bilingual Zero-Shot TTS (Vietnamese only)
-
-Đọc input từ folder data/ rồi ghi output vào outputs/.
-
-Cấu trúc data/:
-  data/
-  ├── ref_audio/          # file WAV tham chiếu (giọng muốn clone)
-  │   └── speaker1.wav
-  └── requests.json       # danh sách các yêu cầu TTS
-
-Định dạng requests.json:
-  [
-    {
-      "id":         "001",
-      "ref_audio":  "speaker1.wav",      <- tên file trong data/ref_audio/
-      "ref_text":   "Xin chào mọi người.",
-      "target":     "Hôm nay thời tiết rất đẹp."
-    },
-    ...
-  ]
-
-Output:
-  outputs/
-  └── 001_speaker1.wav
-"""
-
 import json
 import logging
 import os
@@ -32,7 +5,6 @@ import sys
 import time
 import argparse
 from pathlib import Path
-
 import torch
 
 logging.basicConfig(
@@ -86,7 +58,6 @@ def process(engine, requests: list[dict], mode: str = "standard") -> None:
         ref_text = req.get("ref_text", "")
         target = req.get("target", "")
 
-        # Validate
         if not ref_audio or not ref_text or not target:
             logger.warning(f"[{i}/{total}] id={req_id}  SKIP — missing field")
             failed += 1
@@ -98,7 +69,6 @@ def process(engine, requests: list[dict], mode: str = "standard") -> None:
             failed += 1
             continue
 
-        # Output filename: {id}_{ref_audio_stem}.wav
         out_name = f"{req_id}_{ref_path.stem}.wav"
         out_path = OUTPUT_DIR / out_name
 
@@ -115,12 +85,12 @@ def process(engine, requests: list[dict], mode: str = "standard") -> None:
             )
             engine.save(wav, out_path)
             elapsed = time.perf_counter() - t0
-            logger.info(f" ✓  saved → {out_path.name}  ({elapsed:.1f}s)")
+            logger.info(f"SAVED → {out_path.name}  ({elapsed:.1f}s)")
             success += 1
 
         except Exception as e:
             elapsed = time.perf_counter() - t0
-            logger.error(f" ✗  FAILED ({elapsed:.1f}s): {e}")
+            logger.error(f"FAILED ({elapsed:.1f}s): {e}")
             failed += 1
 
     logger.info(f"\n{'─'*50}")

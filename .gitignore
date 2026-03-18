@@ -179,9 +179,10 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
-# data sample
 
 # models
+src/models/
+src/tts/models/
 models/
 
 # outputs

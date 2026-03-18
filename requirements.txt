@@ -1,20 +1,27 @@
-# Core ML Framework
-torch>=2.0.0
-# torchaudio — install separately to match torch version:
-#   pip install torch torchaudio --extra-index-url https://download.pytorch.org/whl/cu121
+# pip install torch==2.8.0 torchaudio==2.8.0 torchvision==0.23.0
 
-# Transformers & Model Loading
-transformers>=4.40.0
-huggingface_hub>=0.22.0
+numpy>=1.26,<2.0
+scipy>=1.11,<1.17
+soundfile>=0.13,<0.14
+librosa>=0.11,<0.12
 
-# Audio Processing
-librosa>=0.10.0
-soundfile>=0.12.0
-numpy>=1.24.0
+huggingface_hub>=0.36,<1.0
+safetensors>=0.7,<1.0
+sentencepiece>=0.2,<0.3
+accelerate>=1.13,<2.0
 
-# Core TTS Models
-neucodec>=0.0.4
-sea-g2p>=0.1.0
+phonemizer>=3.3,<4.0
+einops>=0.8,<0.9
+transformers>=4.57,<5.0
+torchtune==0.6.1
+vector-quantize-pytorch>=1.17,<2.0
+local-attention>=1.11,<2.0
+lmdeploy>=0.11,<0.12
 
-# Fast Mode (GPU/LMDeploy) - optional but recommended for GPU
-lmdeploy>=0.1.0
+# Optional features:
+# peft>=0.14,<0.15               # LoRA loading
+# onnxruntime>=1.18,<2.0         # ONNX codec decoder on CPU
+# perth>=1.0,<2.0                # Audio watermarking
+
+# System package required by phonemizer:
+# apt-get update && apt-get install -y espeak-ng
